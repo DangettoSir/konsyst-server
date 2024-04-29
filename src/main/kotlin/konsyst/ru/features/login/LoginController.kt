@@ -1,5 +1,4 @@
 package konsyst.ru.features.login
-
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
@@ -9,8 +8,8 @@ import konsyst.ru.database.tokens.Tokens
 import konsyst.ru.database.users.Users
 import java.util.*
 
-class LoginController(private val call: ApplicationCall) {
-    suspend fun loginExecute(){
+class LoginController() {
+    suspend fun loginExecute(call: ApplicationCall){
         val receive = call.receive<LoginRecevie>()
         val userDTO = Users.fetchUser(receive.login)
         if(userDTO == null){

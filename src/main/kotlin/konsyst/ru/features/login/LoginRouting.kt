@@ -10,10 +10,10 @@ import konsyst.ru.cache.TokenCache
 import java.util.*
 
 fun Application.configureLoginRouting() {
+    val loginController = LoginController()
     routing {
         post("/login") {
-            val loginController = LoginController(call)
-            loginController.loginExecute()
+            loginController.loginExecute(call)
         }
     }
 }

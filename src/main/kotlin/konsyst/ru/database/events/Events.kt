@@ -25,7 +25,7 @@ object Events: Table() {
         }
     }
 
-    fun fetchTokens(): List<EventsDataTransferObject> {
+    fun fetchEvents(): List<EventsDataTransferObject> {
         return try {
             transaction {
                 Events.selectAll().toList()

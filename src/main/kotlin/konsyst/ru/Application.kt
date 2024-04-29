@@ -4,6 +4,7 @@ import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
 import konsyst.ru.features.login.configureLoginRouting
+import konsyst.ru.features.events.configureEventsRouting
 import konsyst.ru.features.register.configureRegisterRouting
 import konsyst.ru.plugins.*
 import org.jetbrains.exposed.sql.Database
@@ -23,6 +24,7 @@ fun Application.module() {
     configureRouting()
     configureRegisterRouting()
     configureLoginRouting()
+    configureEventsRouting()
     configureSockets()
     configureSerialization()
     configureHTTP()

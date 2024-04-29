@@ -11,9 +11,9 @@ import konsyst.ru.database.users.Users
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import java.util.*
 
-class RegisterController(val call: ApplicationCall) {
+class RegisterController() {
 
-    suspend fun registerNewUser(){
+    suspend fun registerNewUser(call: ApplicationCall){
         val registerReceive = call.receive<RegisterReceive>()
 
         val userDTO = Users.fetchUser(registerReceive.login)
