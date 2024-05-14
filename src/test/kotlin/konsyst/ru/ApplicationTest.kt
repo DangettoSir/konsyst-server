@@ -17,7 +17,7 @@ fun testRoot() {
         handleRequest(HttpMethod.Get, "/test").apply {
             assertEquals(HttpStatusCode.OK, response.status())
             assertEquals("Test Hello World", response.content)
+            }
         }
     }
-}
 }

@@ -10,34 +10,49 @@ import konsyst.ru.database.users.UserDataTransferObject
 import konsyst.ru.database.users.Users
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import java.util.*
+import kotlin.random.Random
 
-class RegisterController() {
+class RegisterController {
 
-    suspend fun registerNewUser(call: ApplicationCall){
+    suspend fun registerNewUser(call: ApplicationCall) {
         val registerReceive = call.receive<RegisterReceive>()
-
         val userDTO = Users.fetchUser(registerReceive.login)
 
-        if (userDTO != null){
+        if (userDTO != null) {
             call.respond(HttpStatusCode.Conflict, "User already exists")
-        } else{
+        } else {
             val token = UUID.randomUUID().toString()
-            try{
-                Users.insert(
-                    UserDataTransferObject(
-                        login = registerReceive.login,
-                        password = registerReceive.password,
-                        username=""
-                    )
-                )
-            } catch (e: ExposedSQLException){
+            val userDTO = registerReceive.mapToUserDTO()
+
+            val existingIds = Users.fetchUsers().map { it.id }.toSet()
+            userDTO.id = generateUniqueId(existingIds)
+
+            try {
+                Users.insert(userDTO)
+                Tokens.insert(TokenDataTransferObject(rowId = UUID.randomUUID().toString(), login = registerReceive.login, token = token))
+                call.respond(RegisterResponse(token = token))
+            } catch (e: ExposedSQLException) {
                 call.respond(HttpStatusCode.Conflict, "User already exists")
             } catch (e: Exception) {
-            call.respond(HttpStatusCode.BadRequest, "Can't create user ${e.localizedMessage}")
+                call.respond(HttpStatusCode.BadRequest, "Can't create user ${e.localizedMessage}")
             }
-
-            Tokens.insert(TokenDataTransferObject(rowId = UUID.randomUUID().toString(), login = registerReceive.login, token = token))
-            call.respond(RegisterResponse(token = token))
         }
+    }
+
+    fun generateUniqueId(existingIds: Set<Int?>): Int {
+        var uniqueId: Int
+        do {
+            uniqueId = Random.nextInt(Int.MAX_VALUE)
+        } while (existingIds.contains(uniqueId))
+        return uniqueId
+    }
+
+    private fun RegisterReceive.mapToUserDTO(): UserDataTransferObject {
+        return UserDataTransferObject(
+            login = this.login,
+            password = this.password,
+            username = "",
+            id = null
+        )
     }
 }

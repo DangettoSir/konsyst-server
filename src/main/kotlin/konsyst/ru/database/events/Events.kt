@@ -1,46 +1,71 @@
 package konsyst.ru.database.events
 
-import org.jetbrains.exposed.sql.Table
-import org.jetbrains.exposed.sql.insert
-import org.jetbrains.exposed.sql.selectAll
+import konsyst.ru.database.events.Events.select
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 
-object Events: Table() {
-    private val eventId = Events.varchar("eventId", 50)
-    private val eventName = Events.varchar("eventName", 25)
-    private val eventTag = Events.varchar("eventTag", 25)
-    private val eventTaD = Events.varchar("eventTaD", 25)
-    private val scenarioBundle = Events.varchar("scenarioBundle", 50)
+object Events : Table("events") {
+    internal val id = Events.integer("id").autoIncrement()
+    internal val title = Events.varchar("title", 255)
+    internal val date = Events.varchar("date", 10)
+    internal val scenariosCount = Events.integer("scenarios_count")
+    internal val scenariosComplete = Events.integer("scenarios_complete")
+    internal val userId = Events.integer("user_id").nullable()
+    internal val status = Events.varchar("status", 20)
 
-
-    fun insert(eventsDataTransferObject: EventsDataTransferObject) {
+    fun insert(eventDTO: EventDataTransferObject) {
         transaction {
             Events.insert {
-                it[eventId] = eventsDataTransferObject.eventId
-                it[eventName] = eventsDataTransferObject.eventName
-                it[eventTag] = eventsDataTransferObject.eventTag
-                it[eventTaD] = eventsDataTransferObject.eventTaD
-                it[scenarioBundle] = eventsDataTransferObject.scenarioBundle
+                it[id] = eventDTO.id ?: 0
+                it[title] = eventDTO.title
+                it[date] = eventDTO.date
+                it[scenariosCount] = eventDTO.scenariosCount ?: 0
+                it[scenariosComplete] = eventDTO.scenariosComplete ?: 0
+                it[userId] = eventDTO.userId
+                it[status] = eventDTO.status.name
             }
         }
     }
 
-    fun fetchEvents(): List<EventsDataTransferObject> {
+    fun fetchEvents(): List<EventDataTransferObject> {
         return try {
             transaction {
-                Events.selectAll().toList()
-                    .map {
-                        EventsDataTransferObject(
-                            eventId = it[Events.eventId],
-                            eventName = it[Events.eventName],
-                            eventTag = it[Events.eventTag],
-                            eventTaD = it[Events.eventTaD],
-                            scenarioBundle = it[Events.scenarioBundle]
-                        )
-                    }
+                Events.selectAll().map {
+                    EventDataTransferObject(
+                        id = it[Events.id],
+                        title = it[title],
+                        date = it[date],
+                        scenariosCount = it[scenariosCount],
+                        scenariosComplete = it[scenariosComplete],
+                        userId = it[userId],
+                        status = EventStatus.valueOf(it[status])
+                    )
+                }
             }
         } catch (e: Exception) {
             emptyList()
+        }
+    }
+
+    fun fetchEvent(id: Int): EventDataTransferObject? {
+        return try {
+            transaction {
+                Events.select { Events.id eq id }
+                    .map {
+                        EventDataTransferObject(
+                            id = it[Events.id],
+                            title = it[title],
+                            date = it[date],
+                            scenariosCount = it[scenariosCount],
+                            scenariosComplete = it[scenariosComplete],
+                            userId = it[userId],
+                            status = EventStatus.valueOf(it[status])
+                        )
+                    }
+                    .singleOrNull()
+            }
+        } catch (e: Exception) {
+            null
         }
     }
 }

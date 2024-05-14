@@ -1,40 +1,46 @@
 package konsyst.ru.database.events
 
-import java.util.UUID
+import kotlinx.serialization.Serializable
 import konsyst.ru.features.events.models.CreateEventRequest
 import konsyst.ru.features.events.models.CreateEventResponse
 import konsyst.ru.features.events.models.EventResponse
 
-data class EventsDataTransferObject(
-    val eventId: String,
-    val eventName: String,
-    val eventTag: String,
-    val eventTaD: String,
-    val scenarioBundle: String
+@Serializable
+data class EventDataTransferObject(
+    var id: Int? = null,
+    val title: String,
+    val date: String,
+    val scenariosCount: Int? = null,
+    val scenariosComplete: Int? = null,
+    val userId: Int? = null,
+    val status: EventStatus
 )
 
-fun CreateEventRequest.mapToEventDTO(): EventsDataTransferObject =
-    EventsDataTransferObject(
-        eventId = UUID.randomUUID().toString(),
-        eventName = eventName,
-        eventTag = eventTag,
-        eventTaD = eventTaD,
-        scenarioBundle = UUID.randomUUID().toString()
+fun CreateEventRequest.mapToEventDTO(): EventDataTransferObject =
+    EventDataTransferObject(
+        title = title,
+        date = date,
+        status = EventStatus.UPCOMING
     )
 
-fun EventsDataTransferObject.mapToCreateEventResponse(): CreateEventResponse =
+fun EventDataTransferObject.mapToCreateEventResponse(): CreateEventResponse =
     CreateEventResponse(
-        eventId = eventId,
-        eventName = eventName,
-        eventTag = eventTag,
-        eventTaD = eventTaD,
-        scenarioBundle = scenarioBundle
+        id = id,
+        title = title,
+        date = date,
+        scenariosCount = scenariosCount,
+        scenariosComplete = scenariosComplete,
+        userId = userId,
+        status = status
     )
 
-fun EventsDataTransferObject.mapToEventResponse(): EventResponse = EventResponse(
-    eventId = eventId,
-    eventName = eventName,
-    eventTag = eventTag,
-    eventTaD = eventTaD,
-    scenarioBundle = scenarioBundle
-)
+fun EventDataTransferObject.mapToEventResponse(): EventResponse =
+    EventResponse(
+        id = id,
+        title = title,
+        date = date,
+        scenariosCount = scenariosCount,
+        scenariosComplete = scenariosComplete,
+        userId = userId,
+        status = status
+    )

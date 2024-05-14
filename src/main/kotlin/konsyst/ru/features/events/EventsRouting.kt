@@ -13,5 +13,11 @@ fun Application.configureEventsRouting() {
         post("/events/search"){
             eventsController.Search(call)
         }
+        post("/events/link-scenarios") {
+            eventsController.linkScenarios(call)
+        }
+        get("/events/get-linked-scenarios"){
+            eventsController.getEventScenarios(call)
+        }
     }
 }
