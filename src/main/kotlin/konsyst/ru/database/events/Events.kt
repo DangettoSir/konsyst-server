@@ -1,16 +1,18 @@
 package konsyst.ru.database.events
 
-import konsyst.ru.database.events.Events.select
-import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.Table
+import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
 object Events : Table("events") {
-    internal val id = Events.integer("id").autoIncrement()
+    internal val id = Events.integer("id")
     internal val title = Events.varchar("title", 255)
     internal val date = Events.varchar("date", 10)
     internal val scenariosCount = Events.integer("scenarios_count")
     internal val scenariosComplete = Events.integer("scenarios_complete")
-    internal val userId = Events.integer("user_id").nullable()
+    internal val userId = Events.integer("user_id")
     internal val status = Events.varchar("status", 20)
 
     fun insert(eventDTO: EventDataTransferObject) {
@@ -21,7 +23,7 @@ object Events : Table("events") {
                 it[date] = eventDTO.date
                 it[scenariosCount] = eventDTO.scenariosCount ?: 0
                 it[scenariosComplete] = eventDTO.scenariosComplete ?: 0
-                it[userId] = eventDTO.userId
+                it[userId] = eventDTO.userId ?: 0
                 it[status] = eventDTO.status.name
             }
         }

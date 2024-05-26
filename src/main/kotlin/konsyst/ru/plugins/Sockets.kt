@@ -1,7 +1,6 @@
 package konsyst.ru.plugins
 
 import io.ktor.server.application.*
-import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.websocket.*
 import io.ktor.websocket.*
@@ -26,5 +25,23 @@ fun Application.configureSockets() {
                 }
             }
         }
+        webSocket("/notifications") { // Путь для WebSocket-соединения
+            // Обработка входящих WebSocket-сообщений
+            for (frame in incoming) {
+                when (frame) {
+                    is Frame.Text -> {
+                        val text = frame.readText()
+                        // Обработка входящих сообщений от клиентов
+                    }
+                    is Frame.Binary -> {
+                        val packet = frame.readBytes()
+                        // Обработка двоичных сообщений от клиентов
+                    }
+
+                    else -> {}
+                }
+            }
+        }
+
     }
 }

@@ -1,9 +1,8 @@
 package konsyst.ru.database.tokens
 
-
-
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
@@ -37,6 +36,23 @@ object Tokens: Table() {
             }
         } catch (e: Exception) {
             emptyList()
+        }
+    }
+    fun fetchToken(login: String): TokenDataTransferObject? {
+        return try {
+            transaction {
+                Tokens.select { Tokens.login eq login }
+                    .map {
+                        TokenDataTransferObject(
+                            rowId = it[Tokens.id],
+                            token = it[Tokens.token],
+                            login = it[Tokens.login]
+                        )
+                    }
+                    .singleOrNull()
+            }
+        } catch (e: Exception) {
+            null
         }
     }
 }

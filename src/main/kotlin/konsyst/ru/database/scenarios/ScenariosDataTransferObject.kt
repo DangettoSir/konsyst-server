@@ -1,10 +1,9 @@
 package konsyst.ru.database.scenarios
 
-
-import kotlinx.serialization.Serializable
 import konsyst.ru.features.scenarios.models.CreateScenarioRequest
 import konsyst.ru.features.scenarios.models.CreateScenarioResponse
 import konsyst.ru.features.scenarios.models.ScenarioResponse
+import kotlinx.serialization.Serializable
 
 @Serializable
 data class ScenariosDataTransferObject(

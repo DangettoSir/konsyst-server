@@ -10,5 +10,8 @@ fun Application.configureStepsRouting() {
         post("/steps/add") {
             stepsController.createStep(call)
         }
+        post("/steps/search") {
+            stepsController.Search(call)
+        }
     }
 }

@@ -1,9 +1,9 @@
 package konsyst.ru.database.events
 
-import kotlinx.serialization.Serializable
 import konsyst.ru.features.events.models.CreateEventRequest
 import konsyst.ru.features.events.models.CreateEventResponse
 import konsyst.ru.features.events.models.EventResponse
+import kotlinx.serialization.Serializable
 
 @Serializable
 data class EventDataTransferObject(
@@ -15,7 +15,6 @@ data class EventDataTransferObject(
     val userId: Int? = null,
     val status: EventStatus
 )
-
 fun CreateEventRequest.mapToEventDTO(): EventDataTransferObject =
     EventDataTransferObject(
         title = title,

@@ -25,6 +25,9 @@ repositories {
 }
 
 dependencies {
+    implementation("de.mkammerer:argon2-jvm:2.11")
+    implementation("io.ktor:ktor-server-auth:2.3.11")
+    implementation("io.ktor:ktor-server-auth-jwt:2.3.11")
     implementation("io.ktor:ktor-server-core-jvm")
     implementation("io.ktor:ktor-server-websockets-jvm")
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm")

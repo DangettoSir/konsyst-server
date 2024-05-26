@@ -8,12 +8,13 @@ import konsyst.ru.database.events.*
 import konsyst.ru.database.scenarios.Scenarios
 import konsyst.ru.database.tokens.Tokens
 import konsyst.ru.database.users.Users
-import konsyst.ru.features.events.models.*
+import konsyst.ru.features.events.models.CreateEventRequest
+import konsyst.ru.features.events.models.EventResponse
+import konsyst.ru.features.events.models.FetchEventsResponse
+import konsyst.ru.features.events.models.LinkScenariosRequest
 import konsyst.ru.utils.TokenCheck
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.deleteWhere
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -22,7 +23,6 @@ import kotlin.random.Random
 class EventsController {
 
     suspend fun Search(call: ApplicationCall) {
-        val request = call.receive<FetchEventsRequest>()
         val token = call.request.headers["Bearer-Authorization"]?.orEmpty()
 
         if (!TokenCheck.isTokenValid(token.toString()) && !TokenCheck.isTokenAdmin(token.toString())) {

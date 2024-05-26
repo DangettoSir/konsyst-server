@@ -2,8 +2,9 @@ package konsyst.ru.features.events
 
 import io.ktor.server.application.*
 import io.ktor.server.routing.*
+import kotlin.io.encoding.ExperimentalEncodingApi
 
-
+@ExperimentalEncodingApi
 fun Application.configureEventsRouting() {
     val eventsController = EventsController()
     routing {

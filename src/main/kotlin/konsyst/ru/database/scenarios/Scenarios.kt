@@ -4,12 +4,12 @@ import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 
 object Scenarios : Table("scenarios") {
-    internal val id = integer("id").autoIncrement() // SERIAL PRIMARY KEY
-    internal val title = varchar("title", 255) // VARCHAR(255) NOT NULL
-    internal val description = text("description") // TEXT NOT NULL
-    internal val date = varchar("date", 10) // VARCHAR(10) NOT NULL
-    internal val location = varchar("location", 255) // VARCHAR(255) NOT NULL
-    internal val isCompleted = bool("is_completed").default(false) // BOOLEAN NOT NULL DEFAULT FALSE
+    internal val id = integer("id")
+    internal val title = varchar("title", 255)
+    internal val description = text("description")
+    internal val date = varchar("date", 15)
+    internal val location = varchar("location", 255)
+    internal val isCompleted = bool("is_completed").default(false)
 
     fun insert(scenarioDTO: ScenariosDataTransferObject) {
         transaction {

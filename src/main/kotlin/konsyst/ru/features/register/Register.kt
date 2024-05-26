@@ -5,12 +5,14 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class RegisterReceive(
-    val login: String,
-    val password: String
+    val username: String,
+    val userNickname : String,
+    val roleId : Int
 )
 
 
 @Serializable
 data class RegisterResponse(
-    val token: String
+    val login: String,
+    val password: String
 )

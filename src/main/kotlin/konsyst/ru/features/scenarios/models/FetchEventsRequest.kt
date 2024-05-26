@@ -1,6 +1,5 @@
 package konsyst.ru.features.scenarios.models
 
-import konsyst.ru.database.events.EventStatus
 import kotlinx.serialization.Serializable
 
 
