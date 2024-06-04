@@ -11,6 +11,7 @@ import konsyst.ru.features.login.configureLoginRouting
 import konsyst.ru.features.register.configureRegisterRouting
 import konsyst.ru.features.scenarios.configureScenariosRouting
 import konsyst.ru.features.steps.configureStepsRouting
+import konsyst.ru.features.userdata.configureUserDataRouting
 import konsyst.ru.plugins.configureHTTP
 import konsyst.ru.plugins.configureRouting
 import konsyst.ru.plugins.configureSecurity
@@ -59,6 +60,7 @@ fun Application.module() {
     }
     configureRouting()
     configureRegisterRouting()
+    configureUserDataRouting()
     configureLoginRouting(jwtConfig)
     configureEventsRouting()
     configureScenariosRouting()

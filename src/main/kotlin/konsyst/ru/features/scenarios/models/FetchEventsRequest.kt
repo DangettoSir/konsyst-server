@@ -20,5 +20,6 @@ data class ScenarioResponse(
     val description: String,
     val date: String,
     val location: String,
-    val isCompleted: Boolean
+    val isCompleted: Boolean,
+    val eventFrom: String? = null
 )

@@ -16,6 +16,21 @@ object EventScenarios : Table("event_scenarios") {
             }
         }
     }
+    fun fetchAllEventScenarios(): List<EventScenario> {
+        return EventScenarios.selectAll()
+            .map { row ->
+                EventScenario(
+                    eventId = row[EventScenarios.eventId]!!,
+                    scenarioId = row[EventScenarios.scenarioId]!!
+                )
+            }
+            .toList()
+    }
+
+    data class EventScenario(
+        val eventId: Int,
+        val scenarioId: Int
+    )
     fun fetchScenarioIds(eventId: Int): List<Int> {
         return transaction {
             EventScenarios.select { EventScenarios.eventId eq eventId }
@@ -30,6 +45,8 @@ object EventScenarios : Table("event_scenarios") {
                 .toList()
         }
     }
+
+
     fun updateScenarioIds(eventId: Int, updatedScenarioIds: List<Int>) {
         transaction {
             val existingScenarios = EventScenarios

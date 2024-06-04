@@ -12,7 +12,8 @@ data class ScenariosDataTransferObject(
     val description: String,
     val date: String,
     val location: String,
-    val isCompleted: Boolean
+    val isCompleted: Boolean,
+    val eventFrom: String? = null
 )
 
 fun CreateScenarioRequest.mapToScenarioDTO(): ScenariosDataTransferObject =
@@ -21,7 +22,7 @@ fun CreateScenarioRequest.mapToScenarioDTO(): ScenariosDataTransferObject =
         description = description,
         date = date,
         location = location,
-        isCompleted = false
+        isCompleted = false,
     )
 
 fun ScenariosDataTransferObject.mapToCreateScenarioResponse(): CreateScenarioResponse =
@@ -42,4 +43,5 @@ fun ScenariosDataTransferObject.mapToScenarioResponse(): ScenarioResponse =
         date = date,
         location = location,
         isCompleted = isCompleted,
+        eventFrom = eventFrom
     )

@@ -34,7 +34,6 @@ class RegisterController {
                     roleId = registerReceive.roleId,
                     argon2ParamsId = 0
                 )
-
                 Users.insert(userDTO)
                 Tokens.insert(
                     TokenDataTransferObject(
@@ -84,6 +83,7 @@ class RegisterController {
     private const val ARGON2_ITERATIONS = 32
     private const val ARGON2_PARALLELISM = 16
     private const val ARGON2_MEMORY_COST = 256 * 1024 // в байтах
+
     @ExperimentalEncodingApi
     private val SALT = "W9xY8dRxc2MzTmJmNWNlMDQwNjNlNjU3".decodeBase64Bytes()
 

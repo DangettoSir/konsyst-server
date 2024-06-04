@@ -13,8 +13,14 @@ fun Application.configureScenariosRouting() {
         post("/scenarios/search") {
             scenariosController.Search(call)
         }
+        post("/scenarios/search-all"){
+            scenariosController.SearchAll(call)
+        }
         post("/scenarios/link-steps") {
             scenariosController.linkSteps(call)
+        }
+        post("/scenarios/update"){
+            scenariosController.updateScenarioStatus(call)
         }
     }
 }

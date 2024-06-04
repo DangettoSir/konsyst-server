@@ -8,5 +8,6 @@ data class UserDataTransferObject(
     val userNickname: String,
     val roleId: Int,
     var argon2ParamsId: Int
+
 )
 

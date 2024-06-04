@@ -12,7 +12,6 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.text.toCharArray
 @ExperimentalEncodingApi
 class LoginController(private val jwtConfig: JwtConfig) {
-
     @ExperimentalEncodingApi
     suspend fun loginExecute(call: ApplicationCall): Unit {
             val receive = try {
@@ -37,7 +36,8 @@ class LoginController(private val jwtConfig: JwtConfig) {
                             token = token.toString(),
                             protectedToken = protectedToken,
                             username = userDTO.username,
-                            userNickname = userDTO.userNickname
+                            userNickname = userDTO.userNickname,
+                            userId = userDTO.id
                         )
                     )
                 } else {

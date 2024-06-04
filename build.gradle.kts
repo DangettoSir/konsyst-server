@@ -25,6 +25,11 @@ repositories {
 }
 
 dependencies {
+    testImplementation ("io.gatling.highcharts:gatling-charts-highcharts:3.7.6")
+    testImplementation ("io.gatling:gatling-test-framework:3.7.6")
+    implementation("org.jetbrains.exposed:exposed-java-time:0.38.2")
+    implementation ("ch.qos.logback:logback-classic:1.2.3")
+    implementation ("org.slf4j:slf4j-api:1.7.30")
     implementation("de.mkammerer:argon2-jvm:2.11")
     implementation("io.ktor:ktor-server-auth:2.3.11")
     implementation("io.ktor:ktor-server-auth-jwt:2.3.11")

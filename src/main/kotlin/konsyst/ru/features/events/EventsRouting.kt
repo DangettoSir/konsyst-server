@@ -17,6 +17,12 @@ fun Application.configureEventsRouting() {
         post("/events/link-scenarios") {
             eventsController.linkScenarios(call)
         }
+        post("/events/status") {
+            eventsController.getEventCompleteStatus(call)
+        }
+        post("/events/statusUpdate") {
+            eventsController.updateEventStatusCall(call)
+        }
         get("/events/get-linked-scenarios"){
             eventsController.getEventScenarios(call)
         }

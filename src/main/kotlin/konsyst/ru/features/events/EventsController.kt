@@ -5,39 +5,36 @@ import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import konsyst.ru.database.events.*
+import konsyst.ru.database.events.Events.fetchEventComplete
+import konsyst.ru.database.events.Events.updateEventStatus
 import konsyst.ru.database.scenarios.Scenarios
 import konsyst.ru.database.tokens.Tokens
 import konsyst.ru.database.users.Users
-import konsyst.ru.features.events.models.CreateEventRequest
-import konsyst.ru.features.events.models.EventResponse
-import konsyst.ru.features.events.models.FetchEventsResponse
-import konsyst.ru.features.events.models.LinkScenariosRequest
+import konsyst.ru.features.events.models.*
 import konsyst.ru.utils.TokenCheck
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
+import org.slf4j.Logger
 import kotlin.random.Random
 
 class EventsController {
 
     suspend fun Search(call: ApplicationCall) {
         val token = call.request.headers["Bearer-Authorization"]?.orEmpty()
-
         if (!TokenCheck.isTokenValid(token.toString()) && !TokenCheck.isTokenAdmin(token.toString())) {
             call.respond(HttpStatusCode.Unauthorized, "Token expired")
             return
         }
-
         val login = fetchLoginFromTokenDatabase(token.toString())
         val userId = login?.let { fetchUserIdFromUserDatabase(it) }
-
         if (userId == null) {
             call.respond(HttpStatusCode.Unauthorized, "User not found")
             return
         }
-
         val events: List<EventResponse> = transaction {
             Events.select { Events.userId eq userId }
                 .map { eventRow ->
@@ -54,9 +51,41 @@ class EventsController {
         }
         call.respond(FetchEventsResponse(events = events))
     }
+    private val logger: Logger = org.slf4j.LoggerFactory.getLogger(this::class.java)
+    internal suspend fun getEventCompleteStatus(call: ApplicationCall){
+        val token = call.request.headers["Bearer-Authorization"]?.orEmpty()
+        if (!TokenCheck.isTokenValid(token.toString()) && !TokenCheck.isTokenAdmin(token.toString())) {
+            call.respond(HttpStatusCode.Unauthorized, "Token expired")
+            return
+        }
+        val request = call.receive<FetchEventStatusRequest>()
+        val complete = fetchEventComplete(request.searchQuery)
+        if(complete == true){
+            logger.info("All true")
+            call.respond(HttpStatusCode.OK)
+        }
+        else{
+            logger.info("ALL FALSE")
+            call.respond(HttpStatusCode.NotFound)
+        }
 
-
-    private suspend fun fetchLoginFromTokenDatabase(token: String): String? {
+    }
+    internal suspend fun updateEventStatusCall(call: ApplicationCall){
+        val token = call.request.headers["Bearer-Authorization"]?.orEmpty()
+        if (!TokenCheck.isTokenValid(token.toString()) && !TokenCheck.isTokenAdmin(token.toString())) {
+            call.respond(HttpStatusCode.Unauthorized, "Token expired")
+            return
+        }
+        val request = call.receive<FetchEventStatusRequest>()
+        val complete = updateEventStatus(request.searchQuery)
+        if(complete == true){
+            call.respond(FetchEventStatusResponse(status = true))
+        }
+        else{
+            call.respond(FetchEventStatusResponse(status = false))
+        }
+    }
+    private fun fetchLoginFromTokenDatabase(token: String): String? {
         return transaction {
             Tokens.select { Tokens.token eq token }
                 .mapNotNull { it[Tokens.login] }
@@ -64,7 +93,7 @@ class EventsController {
         }
     }
 
-    private suspend fun fetchUserIdFromUserDatabase(login: String): Int? {
+    private fun fetchUserIdFromUserDatabase(login: String): Int? {
         return transaction {
             Users.select { Users.login eq login }
                 .map { it[Users.id] }
@@ -78,6 +107,7 @@ class EventsController {
         val scenarios = Scenarios.fetchScenariosIds(scenarioIds)
         call.respond(scenarios)
     }
+
 
     suspend fun createEvent(call: ApplicationCall) {
         val token = call.request.headers["Bearer-Authorization"]
@@ -110,10 +140,7 @@ class EventsController {
             val newScenarioIds = request.scenarioIds.toSet()
 
             transaction {
-                // Получаем существующие связи между событием и сценариями
                 val existingScenarioIds = EventScenarios.fetchScenarioIds(eventId).toMutableSet()
-
-                // Добавляем новые сценарии, которые еще не связаны с этим событием
                 val scenariosToAdd = newScenarioIds - existingScenarioIds
                 scenariosToAdd.forEach { scenarioId ->
                     EventScenarios.insert {
@@ -121,12 +148,14 @@ class EventsController {
                         it[EventScenarios.scenarioId] = scenarioId
                     }
                 }
+
+                val updatedScenariosCount = EventScenarios.fetchScenarioIds(eventId).size
+                Events.update({ Events.id eq eventId }) {
+                    it[Events.scenariosCount] = updatedScenariosCount
+                }
             }
 
-            // Получаем обновленный список связей после добавления новых
             val updatedScenarioIds = EventScenarios.fetchScenarioIds(eventId)
-
-            // Отправляем ответ внутри той же корутины
             call.respond(HttpStatusCode.OK, "Scenarios $updatedScenarioIds linked to event $eventId")
         } else {
             call.respond(HttpStatusCode.Unauthorized, "Token expired")
