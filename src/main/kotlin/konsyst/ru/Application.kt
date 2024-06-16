@@ -8,6 +8,7 @@ import io.ktor.server.netty.*
 import konsyst.ru.database.tokens.JwtConfig
 import konsyst.ru.features.events.configureEventsRouting
 import konsyst.ru.features.login.configureLoginRouting
+import konsyst.ru.features.notifications.NotificationsController
 import konsyst.ru.features.register.configureRegisterRouting
 import konsyst.ru.features.scenarios.configureScenariosRouting
 import konsyst.ru.features.steps.configureStepsRouting
@@ -27,7 +28,7 @@ fun main() {
         user = "postgres",
         password = "fmn!-4737jnbs"
     )
-    embeddedServer(Netty, port = 8080, host = "0.0.0.0", module = Application::module)
+    embeddedServer(Netty, port = 5085, host = "192.168.0.102", module = Application::module)
         .start(wait = true)
 }
 val jwtConfig = JwtConfig(
@@ -42,6 +43,7 @@ val jwtConfig = JwtConfig(
         "user" to "ROLE_USER"
     )
 )
+
 @ExperimentalEncodingApi
 fun Application.module() {
     install(Authentication) {
@@ -58,11 +60,13 @@ fun Application.module() {
             }
         }
     }
+    val notificationsController = NotificationsController(environment)
     configureRouting()
     configureRegisterRouting()
     configureUserDataRouting()
     configureLoginRouting(jwtConfig)
     configureEventsRouting()
+    NotificationsController()
     configureScenariosRouting()
     configureStepsRouting()
     configureSerialization()

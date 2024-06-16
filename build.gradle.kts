@@ -15,7 +15,6 @@ version = "0.0.1"
 
 application {
     mainClass.set("konsyst.ru.ApplicationKt")
-
     val isDevelopment: Boolean = project.ext.has("development")
     applicationDefaultJvmArgs = listOf("-Dio.ktor.development=$isDevelopment")
 }
@@ -27,6 +26,10 @@ repositories {
 dependencies {
     testImplementation ("io.gatling.highcharts:gatling-charts-highcharts:3.7.6")
     testImplementation ("io.gatling:gatling-test-framework:3.7.6")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.3")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.13.3")
+    implementation("org.postgresql:postgresql:42.3.6")
+    implementation("com.zaxxer:HikariCP:5.0.1")
     implementation("org.jetbrains.exposed:exposed-java-time:0.38.2")
     implementation ("ch.qos.logback:logback-classic:1.2.3")
     implementation ("org.slf4j:slf4j-api:1.7.30")
@@ -34,6 +37,7 @@ dependencies {
     implementation("io.ktor:ktor-server-auth:2.3.11")
     implementation("io.ktor:ktor-server-auth-jwt:2.3.11")
     implementation("io.ktor:ktor-server-core-jvm")
+    implementation("io.ktor:ktor-server-cors:2.3.11")
     implementation("io.ktor:ktor-server-websockets-jvm")
     implementation("io.ktor:ktor-serialization-kotlinx-json-jvm")
     implementation("io.ktor:ktor-server-content-negotiation-jvm")
@@ -47,5 +51,5 @@ dependencies {
     implementation("io.ktor:ktor-server-netty-jvm")
     implementation("ch.qos.logback:logback-classic:$logback_version")
     testImplementation("io.ktor:ktor-server-tests-jvm")
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
+    testImplementation("org.jetbrains.kotlin:kolin-test-junit:$kotlin_version")
 }

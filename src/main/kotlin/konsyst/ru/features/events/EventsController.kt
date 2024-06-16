@@ -134,6 +134,7 @@ class EventsController {
 
     suspend fun linkScenarios(call: ApplicationCall) = withContext(Dispatchers.IO) {
         val token = call.request.headers["Bearer-Authorization"]
+
         if (TokenCheck.isTokenAdmin(token.orEmpty())) {
             val request = call.receive<LinkScenariosRequest>()
             val eventId = request.eventId
