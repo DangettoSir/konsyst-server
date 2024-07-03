@@ -12,7 +12,16 @@ fun Application.configureUserDataRouting() {
             userdDataController.getDataSteps(call)
         }
         post("/userdata/request"){
-            userdDataController.createUserDataStep(call)
+            userdDataController.uploadFile(call)
+        }
+        get("/userdata/getcount"){
+            userdDataController.GetUsersCount(call)
+        }
+        get("/userdata/getgroups"){
+            userdDataController.GetUserGroups(call)
+        }
+        post("/userdata/creategroup"){
+            userdDataController.createUserGroup(call)
         }
     }
 }

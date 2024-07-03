@@ -37,6 +37,21 @@ object EventScenarios : Table("event_scenarios") {
                 .map { it[EventScenarios.scenarioId] }
         }
     }
+    fun getEventTitleByScenarioId(scenarioId: Int): String? {
+        return transaction {
+            val eventId = EventScenarios.select { EventScenarios.scenarioId eq scenarioId }
+                .limit(1)
+                .map { it[EventScenarios.eventId] }
+                .singleOrNull()
+
+            eventId?.let { id ->
+                Events.select { Events.id eq id }
+                    .map { it[Events.title] }
+                    .singleOrNull()
+            }
+        }
+    }
+
     fun fetchScenarioIdsByEventName(searchQuery: Int): List<Int> {
         return transaction {
             EventScenarios

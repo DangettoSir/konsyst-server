@@ -7,6 +7,7 @@ import io.ktor.server.response.*
 import konsyst.ru.database.events.*
 import konsyst.ru.database.events.Events.fetchEventComplete
 import konsyst.ru.database.events.Events.updateEventStatus
+import konsyst.ru.database.events.Events.updateEventUserById
 import konsyst.ru.database.scenarios.Scenarios
 import konsyst.ru.database.tokens.Tokens
 import konsyst.ru.database.users.Users
@@ -16,6 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.jetbrains.exposed.sql.update
 import org.slf4j.Logger
@@ -23,6 +25,18 @@ import kotlin.random.Random
 
 class EventsController {
 
+
+
+    suspend fun EventAddUser(call: ApplicationCall){
+        val token = call.request.headers["Bearer-Authorization"]?.orEmpty()
+        if (TokenCheck.isTokenAdmin(token.toString())) {
+            val data  = call.receive<ReceiveUserAdd>()
+            updateEventUserById(data.searchQuery, data.userId)
+            call.respond(HttpStatusCode.OK, "Okayyy")
+        } else{
+            call.respond(HttpStatusCode.Unauthorized, "Token expired")
+        }
+    }
     suspend fun Search(call: ApplicationCall) {
         val token = call.request.headers["Bearer-Authorization"]?.orEmpty()
         if (!TokenCheck.isTokenValid(token.toString()) && !TokenCheck.isTokenAdmin(token.toString())) {
@@ -120,6 +134,50 @@ class EventsController {
 
             Events.insert(event)
             call.respond(event.mapToCreateEventResponse())
+        } else {
+            call.respond(HttpStatusCode.Unauthorized, "Token expired")
+        }
+    }
+
+    suspend fun fetchEvents(call: ApplicationCall) {
+        val token = call.request.headers["Bearer-Authorization"]
+        if (TokenCheck.isTokenAdmin(token.orEmpty())) {
+            val events: List<EventResponse> = transaction {
+                Events.selectAll()
+                    .map { eventRow ->
+                        EventDataTransferObject(
+                            id = eventRow[Events.id],
+                            title = eventRow[Events.title],
+                            date = eventRow[Events.date],
+                            scenariosCount = eventRow[Events.scenariosCount],
+                            scenariosComplete = eventRow[Events.scenariosComplete],
+                            userId = eventRow[Events.userId],
+                            status = EventStatus.valueOf(eventRow[Events.status])
+                        ).mapToEventResponse()
+                    }
+            }
+
+            val eventHtml = buildString {
+                events.forEach { event ->
+                    append("""
+                    <div class="event">
+                        <h4 class="eventtitle p-3">${event.title}
+                            <img class="eventsettings" src="../assets/icons/eventmore.svg" alt="EventMore">
+                        </h4>
+                        <div class="d-flex justify-content-center mb-3">
+                            <button class="btn adds">
+                                <span>
+                                    <img class="addicon me-1"src="../assets/icons/add.svg" alt="Add scenario">
+                                    <span class="addtext">Добавить сценарий</span>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                """)
+                }
+            }
+
+            call.respondText(eventHtml, ContentType.Text.Html)
         } else {
             call.respond(HttpStatusCode.Unauthorized, "Token expired")
         }

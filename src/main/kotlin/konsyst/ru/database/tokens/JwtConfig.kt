@@ -21,9 +21,10 @@ data class JwtConfig(
         .withAudience(audience)
         .build()
 
-    fun generateToken(login: String, role: String? = null): String = JWT.create()
+    fun generateToken(login: String, username: String? = null, role: String? = null): String = JWT.create()
         .withIssuer(issuer)
         .withAudience(audience)
+        .withClaim("username", username)
         .withClaim("login", login)
         .withClaim("role", role)
         .withExpiresAt(Date(System.currentTimeMillis() + expirationTimeInMillis))

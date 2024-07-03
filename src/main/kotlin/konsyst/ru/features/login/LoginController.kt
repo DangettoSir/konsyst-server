@@ -8,6 +8,8 @@ import io.ktor.util.*
 import konsyst.ru.database.tokens.JwtConfig
 import konsyst.ru.database.tokens.Tokens
 import konsyst.ru.database.users.Users
+import konsyst.ru.database.users.Users.fetchRoleByLogin
+import konsyst.ru.database.users.Users.fetchUsernameByLogin
 import kotlin.io.encoding.ExperimentalEncodingApi
 import kotlin.text.toCharArray
 @ExperimentalEncodingApi
@@ -20,6 +22,8 @@ class LoginController(private val jwtConfig: JwtConfig) {
                 call.respond(HttpStatusCode.BadRequest, "Invalid JSON format")
                 return
             }
+            val receivedUsername = fetchUsernameByLogin(receive.login)
+            val receivedRole = fetchRoleByLogin(receive.login)
             val receivedLogin = receive.login
             val receivedPassword = receive.password
             val userDTO = Users.fetchUser(receivedLogin)
@@ -28,9 +32,9 @@ class LoginController(private val jwtConfig: JwtConfig) {
                 call.respond(HttpStatusCode.Unauthorized, "User not found")
             } else {
                 if (verifyPassword(receivedPassword, userDTO.hashedPassword)) {
-                    val role = "user"
+                    val role = receivedRole
                     val token = tokensDTO?.token
-                    val protectedToken = jwtConfig.generateToken(receive.login, role)
+                    val protectedToken = jwtConfig.generateToken(receive.login, receivedUsername, role)
                     call.respond(
                         LoginResponse(
                             token = token.toString(),

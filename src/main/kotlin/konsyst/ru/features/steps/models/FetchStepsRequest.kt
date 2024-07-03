@@ -20,5 +20,6 @@ data class StepsResponse(
     val title: String,
     val scenarioId: Int? = null,
     val action: String,
-    val number: Int? = null
+    val number: Int? = null,
+    val html: String? = null
 )

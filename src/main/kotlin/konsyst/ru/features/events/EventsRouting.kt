@@ -8,6 +8,9 @@ import kotlin.io.encoding.ExperimentalEncodingApi
 fun Application.configureEventsRouting() {
     val eventsController = EventsController()
     routing {
+        post("/events/addUser"){
+            eventsController.EventAddUser(call)
+        }
         post("/events/add") {
             eventsController.createEvent(call)
         }
@@ -22,6 +25,9 @@ fun Application.configureEventsRouting() {
         }
         post("/events/statusUpdate") {
             eventsController.updateEventStatusCall(call)
+        }
+        get("/events/searchAll") {
+            eventsController.fetchEvents(call)
         }
         get("/events/get-linked-scenarios"){
             eventsController.getEventScenarios(call)

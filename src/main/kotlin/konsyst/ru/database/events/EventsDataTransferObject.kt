@@ -13,11 +13,14 @@ data class EventDataTransferObject(
     val scenariosCount: Int? = null,
     val scenariosComplete: Int? = null,
     val userId: Int? = null,
-    val status: EventStatus
+    val status: EventStatus,
+    val comment: String? = null,
+    val userName: String? = null
 )
 fun CreateEventRequest.mapToEventDTO(): EventDataTransferObject =
     EventDataTransferObject(
         title = title,
+        userId = userId,
         date = date,
         status = EventStatus.UPCOMING
     )

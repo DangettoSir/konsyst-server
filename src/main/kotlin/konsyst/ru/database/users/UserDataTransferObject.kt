@@ -1,5 +1,9 @@
 package konsyst.ru.database.users
 
+import kotlinx.serialization.Serializable
+
+
+@Serializable
 data class UserDataTransferObject(
     val id: Int,
     val login: String,
@@ -8,6 +12,5 @@ data class UserDataTransferObject(
     val userNickname: String,
     val roleId: Int,
     var argon2ParamsId: Int
-
 )
 

@@ -1,25 +1,24 @@
 package konsyst.ru.features.userdata.models
 
 import io.ktor.http.content.*
-import kotlinx.serialization.Contextual
 import kotlinx.serialization.Serializable
 
 
 data class CreateDataRequest(
     @Serializable
-    var userId: Int? = null,
+    val userId: Int,
     @Serializable
-    var eventId: Int? = null,
+    val eventId: Int,
     @Serializable
-    var scenarioId: Int? = null,
+    val scenarioId: Int,
     @Serializable
-    var stepId: Int? = null,
-    @Contextual
-    var videoFile: PartData.FileItem? = null,
-    @Contextual
-    var photoFiles: List<PartData.FileItem>? = null,
+    val stepId: Int? = null,
+    @Serializable(with = PartDataFileItemSerializer::class)
+    val videoFile: PartData.FileItem?,
+    @Serializable(with = PartDataFileItemSerializer::class)
+    val photoFiles: List<PartData.FileItem>?,
     @Serializable
-    var userComment: String? = null
+    val userComment: String?
 )
 
 @Serializable

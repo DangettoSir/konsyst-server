@@ -15,6 +15,7 @@ fun Application.configureHTTP() {
         allowHeader(HttpHeaders.Authorization)
         allowHeader(HttpHeaders.ContentType)
         allowHeader(HttpHeaders.AccessControlAllowOrigin)
+        allowHeader("Bearer-Authorization")
         allowNonSimpleContentTypes = true
         allowCredentials = true
         anyHost() // @TODO: Don't do this in production if possible. Try to limit it.

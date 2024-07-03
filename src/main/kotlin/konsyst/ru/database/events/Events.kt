@@ -68,6 +68,15 @@ object Events : Table("events") {
                 .singleOrNull()
         }
     }
+
+    fun updateEventUserById(searchQuery: Int, userId: Int) {
+        return transaction {
+            Events.update({ Events.id.eq(searchQuery) }) {
+                it[Events.userId] = userId
+            }
+        }
+    }
+
     fun fetchEventComplete(searchQuery: Int): Boolean? {
         logger.info("fetchComplete for : $searchQuery")
         return transaction {

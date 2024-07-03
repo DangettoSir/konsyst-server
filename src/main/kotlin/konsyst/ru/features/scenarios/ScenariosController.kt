@@ -16,6 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.select
+import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -43,7 +44,7 @@ class ScenariosController {
                         date = scenarioRow[Scenarios.date],
                         location = scenarioRow[Scenarios.location],
                         isCompleted = scenarioRow[Scenarios.isCompleted],
-                        eventFrom = eventName.toString()
+                        eventFrom = eventName
                     ).mapToScenarioResponse()
                 }
         }
@@ -215,6 +216,70 @@ class ScenariosController {
             }
             val updatedStepIds = ScenarioSteps.fetchStepIds(scenarioId)
             call.respond(HttpStatusCode.OK, "Scenarios $updatedStepIds linked to scenario $scenarioId")
+        } else {
+            call.respond(HttpStatusCode.Unauthorized, "Token expired")
+        }
+    }
+
+    suspend fun fetchScenarios(call: ApplicationCall) {
+        val token = call.request.headers["Bearer-Authorization"]
+        if (TokenCheck.isTokenAdmin(token.orEmpty())) {
+            val scenarios: List<ScenarioResponse> = transaction {
+                Scenarios.selectAll()
+                    .map { scenarioRow ->
+                            ScenariosDataTransferObject(
+                                id = scenarioRow[Scenarios.id],
+                                title = scenarioRow[Scenarios.title],
+                                description = scenarioRow[Scenarios.description],
+                                date = scenarioRow[Scenarios.date],
+                                location = scenarioRow[Scenarios.location],
+                                isCompleted = scenarioRow[Scenarios.isCompleted]
+                            ).mapToScenarioResponse()
+                        }
+            }
+
+            val scenarioHtml = buildString {
+                scenarios.forEach { scenario ->
+                    append("""
+                            <div class="scenario p-3 m-3 mb-4">
+                                <h6 class="title">${scenario.title}</h6>
+                                <div class="info mt-2 d-flex flex-wrap">
+                                    <div class="dates-container d-flex me-3">
+                                        <img class="me-1 time" alt="Time">
+                                        <span class="date">24 мар, 9:00</span>
+                                    </div>
+                                    <div class="comments-container d-flex me-3">
+                                        <img class="me-1 comments" alt="Comments">
+                                        <span class="comment">4</span>
+                                    </div>
+                                    <div class="attachments-container d-flex ">
+                                        <img class="me-1 attachment" alt="Attachments">
+                                        <span class="attachment">2</span>
+                                    </div>
+                                </div>
+                                <div class="users mt-2 d-flex">
+                                    <div class="useravatars me-2 d-flex justify-content-center align-items-center">
+                                        <span class="useravatitle">АЕ</span>
+                                    </div>
+                                    <div class="useravatars me-2 d-flex justify-content-center align-items-center">
+                                        <span class="useravatitle">АЕ</span>
+                                    </div>
+                                    <div class="useravatars me-2 d-flex justify-content-center align-items-center">
+                                        <span class="useravatitle">АЕ</span>
+                                    </div>
+                                    <div class="useravatars me-2 d-flex justify-content-center align-items-center">
+                                        <span class="useravatitle">АЕ</span>
+                                    </div>
+                                    <div class="useravatars me-2 d-flex justify-content-center align-items-center">
+                                        <span class="useravatitle">АЕ</span>
+                                    </div>
+                                </div>
+                            </div>
+                """)
+                }
+            }
+
+            call.respondText(scenarioHtml, ContentType.Text.Html)
         } else {
             call.respond(HttpStatusCode.Unauthorized, "Token expired")
         }

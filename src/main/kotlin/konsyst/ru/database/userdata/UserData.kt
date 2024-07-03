@@ -20,10 +20,10 @@ object UserDataSteps : Table("userdata_steps") {
         transaction {
             UserDataSteps.insert {
                 it[id] = userDataDTO.id ?: 0
-                it[userId] = userDataDTO.userId
-                it[eventId] = userDataDTO.eventId
-                it[scenarioId] = userDataDTO.scenarioId
-                it[stepId] = userDataDTO.stepId
+                it[userId] = userDataDTO.userId ?: 0
+                it[eventId] = userDataDTO.eventId ?: 0
+                it[scenarioId] = userDataDTO.scenarioId ?: 0
+                it[stepId] = userDataDTO.stepId ?: 0
                 it[videoFilePath] = userDataDTO.videoFilePath ?: ""
                 it[photoFilePaths] = userDataDTO.photoFilePaths?.joinToString(", ") ?: ""
                 it[userComment] = userDataDTO.userComment ?: ""
@@ -31,6 +31,15 @@ object UserDataSteps : Table("userdata_steps") {
         }
     }
 
+
+    fun fetchUserCommentByLogin(login: Int): String? {
+        return transaction {
+            UserDataSteps
+                .select { UserDataSteps.userId.eq(login) }
+                .mapNotNull { it[UserDataSteps.userComment] }
+                .singleOrNull()
+        }
+    }
     fun fetchData(id: Int): UsersDataTransferObject? {
         return try {
             transaction {
@@ -54,7 +63,26 @@ object UserDataSteps : Table("userdata_steps") {
             null
         }
     }
-
+    fun fetchUserDatas(): List<UsersDataTransferObject> {
+        return try {
+            transaction {
+                UserDataSteps.selectAll().map {
+                    UsersDataTransferObject(
+                        id = it[UserDataSteps.id],
+                        userId = it[UserDataSteps.userId],
+                        eventId= it[UserDataSteps.eventId],
+                        scenarioId = it[UserDataSteps.scenarioId],
+                        stepId = it[UserDataSteps.stepId],
+                        videoFilePath = it[videoFilePath],
+                        photoFilePaths = listOf(it[photoFilePaths]),
+                        userComment = it[UserDataSteps.userComment]
+                    )
+                }
+            }
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
     fun fetchDatas(): List<UsersDataTransferObject> {
         return try {
             transaction {

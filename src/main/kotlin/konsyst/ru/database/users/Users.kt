@@ -28,6 +28,8 @@ object Users: Table(){
             }
         }
     }
+
+
     fun fetchUsers(): List<UserDataTransferObject> {
         return try {
             transaction {
@@ -47,6 +49,62 @@ object Users: Table(){
             emptyList()
         }
     }
+
+    fun fetchUsersCount(): Int {
+        return try {
+            transaction {
+                Users.selectAll().count().toInt()
+            }
+        } catch (e: Exception) {
+            0
+        }
+    }
+
+
+    fun fetchUsernameByLogin(login: String): String? {
+        return transaction {
+            Users
+                .select { Users.login.eq(login) }
+                .mapNotNull { it[username] }
+                .singleOrNull()
+        }
+    }
+    fun fetchUserNameById(id : Int): String?{
+        return transaction {
+            Users
+                .select{Users.id.eq(id)}
+                .mapNotNull { it[username] }
+                .singleOrNull()
+        }
+    }
+
+    fun fetchUsersNamesById(ids: List<Int>): List<String> {
+        return transaction {
+            Users.select { Users.id.inList(ids) }
+                .map { it[Users.username] }
+                .toList()
+        }
+    }
+
+
+    fun fetchRoleByLogin(login: String): String? {
+        return transaction {
+            Users
+                .select { Users.login.eq(login) }
+                .mapNotNull {
+                    when (it[Users.roleId]) {
+                        0 -> "superadmin"
+                        1 -> "admin"
+                        2 -> "watchdog"
+                        3 -> "support"
+                        4 -> "user"
+                        else -> null
+                    }
+                }
+                .singleOrNull()
+        }
+    }
+
     fun fetchUser(login: String): UserDataTransferObject? {
         return try {
             transaction {

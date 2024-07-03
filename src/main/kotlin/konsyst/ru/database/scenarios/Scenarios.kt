@@ -1,5 +1,6 @@
 package konsyst.ru.database.scenarios
 
+import konsyst.ru.database.events.EventScenarios
 import konsyst.ru.database.events.Events
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -45,6 +46,8 @@ object Scenarios : Table("scenarios") {
         )
     }
 
+
+
     fun fetchScenarios(): List<ScenariosDataTransferObject> {
         return try {
             transaction {
@@ -63,6 +66,8 @@ object Scenarios : Table("scenarios") {
             emptyList()
         }
     }
+
+
     fun updateStatus(id: Int, eventId: Int, isCompleted: Boolean): Boolean {
         return transaction {
             logger.info("Updating status for scenario ID: $id, isCompleted: $isCompleted")
@@ -94,6 +99,7 @@ object Scenarios : Table("scenarios") {
         }
     }
     fun fetchScenario(ids: Int): ScenariosDataTransferObject? {
+        val eventfrom = EventScenarios.getEventTitleByScenarioId(ids)
         return try {
             transaction {
                 Scenarios.select { Scenarios.id eq ids }
@@ -102,6 +108,7 @@ object Scenarios : Table("scenarios") {
                             id = it[Scenarios.id],
                             title = it[title],
                             description = it[description],
+                            eventFrom = eventfrom,
                             date = it[date],
                             location = it[location],
                             isCompleted = it[isCompleted]

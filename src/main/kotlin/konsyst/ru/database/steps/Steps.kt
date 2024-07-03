@@ -1,13 +1,8 @@
 package konsyst.ru.database.steps
 
-import konsyst.ru.database.events.EventDataTransferObject
-import konsyst.ru.database.events.EventStatus
-import konsyst.ru.database.events.Events
-import konsyst.ru.database.scenarios.Scenarios
-import konsyst.ru.database.scenarios.ScenariosDataTransferObject
-import org.jetbrains.exposed.sql.ReferenceOption
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.insert
+import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 
@@ -29,7 +24,37 @@ object Steps : Table("steps") {
             }
         }
     }
+    fun fetchStepsByIds(stepIds: List<Int>): List<StepsDataTransferObject> {
+        return transaction {
+            Steps.select { Steps.id inList stepIds }
+                .mapNotNull { row ->
+                    StepsDataTransferObject(
+                        id = row[Steps.id],
+                        title = row[Steps.title],
+                        scenarioId = row[Steps.scenarioId],
+                        action = row[Steps.action],
+                        number = row[Steps.number]
+                    )
+                }
+                .toList()
+        }
+    }
 
+    fun fetchStepById(stepId: Int): StepsDataTransferObject? {
+        return transaction {
+            Steps.select { Steps.id eq(stepId) }
+                .mapNotNull { row ->
+                    StepsDataTransferObject(
+                        id = row[Steps.id],
+                        title = row[Steps.title],
+                        scenarioId = row[Steps.scenarioId],
+                        action = row[Steps.action],
+                        number = row[Steps.number]
+                    )
+                }
+                .singleOrNull()
+        }
+    }
 
     fun fetchSteps(): List<StepsDataTransferObject> {
         return try {

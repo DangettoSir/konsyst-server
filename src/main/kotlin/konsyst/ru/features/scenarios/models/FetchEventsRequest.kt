@@ -1,5 +1,7 @@
 package konsyst.ru.features.scenarios.models
 
+import konsyst.ru.database.scenarios.ScenariosDataTransferObject
+import konsyst.ru.features.steps.models.StepsResponse
 import kotlinx.serialization.Serializable
 
 
@@ -8,6 +10,14 @@ data class FetchScenariosRequest (
     val searchQuery: Int
 )
 
+
+
+
+@Serializable
+data class FetchScenarioResponse(
+    val scenario: ScenariosDataTransferObject?,
+    val steps: List<StepsResponse>
+)
 @Serializable
 data class FetchScenariosResponse(
     val scenarios: List<ScenarioResponse>

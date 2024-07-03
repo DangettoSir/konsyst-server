@@ -13,6 +13,7 @@ import konsyst.ru.features.register.configureRegisterRouting
 import konsyst.ru.features.scenarios.configureScenariosRouting
 import konsyst.ru.features.steps.configureStepsRouting
 import konsyst.ru.features.userdata.configureUserDataRouting
+import konsyst.ru.features.web.configureWebRouting
 import konsyst.ru.plugins.configureHTTP
 import konsyst.ru.plugins.configureRouting
 import konsyst.ru.plugins.configureSecurity
@@ -67,6 +68,7 @@ fun Application.module() {
     configureLoginRouting(jwtConfig)
     configureEventsRouting()
     NotificationsController()
+    configureWebRouting()
     configureScenariosRouting()
     configureStepsRouting()
     configureSerialization()
